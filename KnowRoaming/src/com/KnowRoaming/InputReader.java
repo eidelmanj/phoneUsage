@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.Date;
 
 
@@ -17,16 +18,28 @@ public class InputReader {
 	
 	
 	
+	
+	
 	public static void main(String[] args) {
 		UserRecord r;
+		UsageRecord u;
+		SQLCommunicator sqlCom;
+		
+		
 		try {
-			SQLCommunicator sqlCom = new SQLCommunicator("root", "root", "knowroaming");
-			r = new UserRecord("Jim", "jim@jim.com", "123-4567", sqlCom);
-			r.commit();
+			sqlCom = new SQLCommunicator("root", "root", "knowroaming");
+			
 		} catch(Exception e) {
 			System.err.println("Error connecting to MySQL DB");
 			e.printStackTrace();
+			System.exit(-1);
 		}
+		
+		
+		
+		
+		
+		
 	}
 
 }

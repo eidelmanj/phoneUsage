@@ -104,6 +104,10 @@ public String getPhoneNumber() {
     return this.phoneNumber;
 }
 
+public String getUserId() {
+	return this.uniqueId;
+}
+
 
 
 }
