@@ -1,9 +1,13 @@
 package com.KnowRoaming;
 import java.security.SecureRandom;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+
+import com.mysql.jdbc.Statement;
+
 import java.math.BigInteger;
 
 /*                                                                                                                                                                                                          
@@ -26,6 +30,7 @@ public class UserRecord implements SQLRecord {
     
     // Creates a UserRecord object that retrieves a User that already exists within the database
     public UserRecord(String id, SQLCommunicator sqlCom) throws Exception {
+    	this.sqlCom = sqlCom;
     	String sqlQuery = "SELECT * FROM user_records WHERE"
     			+ " unique_id = \"" + id + "\"";
     	
@@ -45,6 +50,7 @@ public class UserRecord implements SQLRecord {
     	if (qName != null) this.name = qName;
     	if (qEmail != null) this.email = qEmail;
     	if (qPhoneNumber != null) this.phoneNumber = qPhoneNumber;
+    	this.uniqueId = id;
     }
 
     public UserRecord() {
@@ -100,20 +106,34 @@ public class UserRecord implements SQLRecord {
 public ArrayList<UsageRecord> findAllRecords(LocalDate startDate, LocalDate endDate) {
 	ArrayList<UsageRecord> recordList = new ArrayList<UsageRecord>();
 	
-	String sqlCmd =
-	       "SELECT * FROM usage_records WHERE user_ID = " + this.getUserId()
-	       		+ " AND start_date > " + 
-	       		"STR_TO_DATE('"+startDate.getDayOfMonth()+"-" 
-			 	+ startDate.getMonthValue() + "-" 
-			 	+ startDate.getYear() + "', '%d-%m-%Y')" 
-			 	+ " AND end_date < "  
-	       		+ "STR_TO_DATE('"+endDate.getDayOfMonth()+"-" 
-			 	+ startDate.getMonthValue() + "-" 
-			 	+ startDate.getYear() + "', '%d-%m-%Y')";
+	
+	String sqlCmd = "SELECT usage_records.start_date, usage_records.end_date, data_types.tp_name"
+			+ " FROM usage_records JOIN data_types ON usage_records.tp_ID = data_types.ID"
+			+ " WHERE user_ID = \"" + this.getUserId() + "\""
+		    + " AND start_date > " 
+		    + this.sqlCom.DateToString(startDate) 
+			+ " AND end_date < "  
+		    + this.sqlCom.DateToString(endDate);
+	
+	
+
 	try {
-		this.sqlCom.executeQuery(sqlCmd);
+		
+		ResultSet rSet = this.sqlCom.executeQuery(sqlCmd);
+		while (rSet.next()) {
+			LocalDate curStartDate = rSet.getDate("start_date").toLocalDate();
+			LocalDate curEndDate = rSet.getDate("end_date").toLocalDate();
+			String dataType = rSet.getString("tp_name");
+			
+			
+			
+			recordList.add(new UsageRecord(this.uniqueId, curStartDate,
+					curEndDate, dataType, this.sqlCom));
+		}
+		
 	} catch (Exception e) {
-		// TODO Auto-generated catch block
+		// There should really never be an Exception here, since we have already verified that
+		// the user exists in the DB by the time this runs. Therefore we print a StackTrace
 		e.printStackTrace();
 	}
 	

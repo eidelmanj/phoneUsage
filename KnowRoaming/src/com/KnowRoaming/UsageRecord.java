@@ -51,11 +51,8 @@ public class UsageRecord implements SQLRecord {
 			 + "(DEFAULT,"
 			 + "\"" + this.userId + "\","
 			 + "(SELECT ID FROM data_types WHERE tp_name = \"" + this.dataType + "\"),"
-			 + "STR_TO_DATE('"+this.startDate.getDayOfMonth()+"-" 
-			 	+ this.startDate.getMonthValue() + "-" 
-			 	+ this.startDate.getYear() + "', '%d-%m-%Y'),"
-			 + "STR_TO_DATE('"+this.endDate.getDayOfMonth()+"-" + this.endDate.getMonthValue() + "-" 
-				 + this.endDate.getYear() + "', '%d-%m-%Y'));";
+			 + this.sqlCom.DateToString(this.startDate) + ", "
+			 + this.sqlCom.DateToString(this.endDate) +");";
 		
 		try {
 			this.sqlCom.commitUpdate(sqlCmd);

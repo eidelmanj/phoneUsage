@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -19,11 +20,23 @@ import java.util.Scanner;
 
 public class InputReader {
 	
+	
+	//Print Usage Information List
+	public static void printUsageList(ArrayList<UsageRecord> l) {
+		if (l.isEmpty())
+			System.out.println("There are no usage records in the time period requested");
+		for (UsageRecord uRecord : l) {
+			System.out.println("(user: " + uRecord.userId +", start_date: " 
+		+ uRecord.startDate.toString() + ", end_date: " + uRecord.endDate.toString() + ", "
+				+ "data_type: "+ uRecord.dataType + ")");
+		}
+	}
+	
 	// Parse User Input, and execute given command
 	public static void parseAndExecute(String inStr, SQLCommunicator sqlCom) {
 		String[] inputParts = inStr.split(" "); // Split string into command and arguments
 		
-		
+		final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 		if (inputParts.length == 0 ) return;
 		//for (int i =0 ; i< inputParts.length; i ++ ) System.out.println(inputParts[i]);
 		
@@ -51,7 +64,7 @@ public class InputReader {
 				return;
 			}
 			
-			final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			
 			
 		
 			try {
@@ -70,6 +83,33 @@ public class InputReader {
 			}
 		}
 		
+		else if (inputParts[0].equals("SHOW")) {
+			UserRecord r;
+			if (inputParts.length < 6) {
+				System.out.println("Incorrect usage: SHOW user_id FROM dd-MM-yyyy TO dd-MM-yyyy");
+				return;
+			}
+			try {
+				r = new UserRecord(inputParts[1], sqlCom);
+				LocalDate startDate = LocalDate.parse(inputParts[3], DATE_FORMAT);
+				LocalDate endDate = LocalDate.parse(inputParts[5], DATE_FORMAT);
+				ArrayList<UsageRecord> usageRList = r.findAllRecords(startDate, endDate);
+				
+				printUsageList(usageRList);
+				
+				
+				
+			} catch (NonExistentUserException e) {
+				System.out.println(e.getMessage());
+				
+			} catch (DateTimeParseException e) {
+				System.out.println("Incorrect date format! Please use 'dd-MM-yyyy'");
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		
 	}
 	
 	
@@ -83,6 +123,7 @@ public class InputReader {
 		// Establish a connection
 		try {
 			sqlCom = new SQLCommunicator("root", "root", "knowroaming");
+
 
 			
 		} catch(Exception e) {

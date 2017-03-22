@@ -1,10 +1,13 @@
 package com.KnowRoaming;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class SQLCommunicator {
 	private String uname;
@@ -41,7 +44,16 @@ public class SQLCommunicator {
     	this.conn.close();
     	
     }
+
+    // Converts a LocalDate object into a String that MySQL can understand
+    public String DateToString(LocalDate d) {
     
+    	String sqlDateStr = "STR_TO_DATE('"+d.getDayOfMonth()+"-" 
+			 	+ d.getMonthValue() + "-" 
+			 	+ d.getYear() + "', '%d-%m-%Y')";
+    	return sqlDateStr;
+    	
+    }
     
     public void commitUpdate(String updateStr) throws Exception {
     	Statement stmt = conn.createStatement();
@@ -49,7 +61,9 @@ public class SQLCommunicator {
     }
     
     public ResultSet executeQuery(String query) throws Exception {
-    	Statement stmt =  conn.createStatement();
+    	Statement stmt =  conn.prepareStatement(query);
+    	
+    
     	ResultSet r = stmt.executeQuery(query);
     	return r;
     	
@@ -62,5 +76,8 @@ public class SQLCommunicator {
 		this.dbUrl = "jdbc:mysql://localhost/"+ dbname +"?"
 	    		+ "autoReconnect=true&useSSL=false";
 		this.connectSQL();
+		
 	}
+	
+
 }
