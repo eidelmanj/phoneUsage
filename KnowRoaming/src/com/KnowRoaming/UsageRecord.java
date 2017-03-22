@@ -1,7 +1,10 @@
 package com.KnowRoaming;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Date;
+
+
 
 public class UsageRecord implements SQLRecord {
 	SQLCommunicator sqlCom;
@@ -34,8 +37,9 @@ public class UsageRecord implements SQLRecord {
 	}
 	
 	void validate() throws Exception {
-		if (!validDates()) throw new Exception();
-		if (!validData()) throw new Exception();
+		if (!validDates()) throw new InvalidArgumentException("dates_invalid", "Your start date cannot be after your end date");
+		if (!validData()) 
+			throw new InvalidArgumentException("datatype_invalid", "Please choose from the given data type options (DATA, VOICE, ALL, SMS)");
 		
 	}
 	
@@ -45,15 +49,21 @@ public class UsageRecord implements SQLRecord {
 		String sqlCmd =
 			 "INSERT INTO usage_records (ID, user_ID, tp_ID, start_date, end_date) VALUES"
 			 + "(DEFAULT,"
-			 + "(SELECT ID FROM user_records WHERE unique_id = \"" + this.userId + "\"),"
+			 + "\"" + this.userId + "\","
 			 + "(SELECT ID FROM data_types WHERE tp_name = \"" + this.dataType + "\"),"
 			 + "STR_TO_DATE('"+this.startDate.getDayOfMonth()+"-" 
 			 	+ this.startDate.getMonthValue() + "-" 
 			 	+ this.startDate.getYear() + "', '%d-%m-%Y'),"
 			 + "STR_TO_DATE('"+this.endDate.getDayOfMonth()+"-" + this.endDate.getMonthValue() + "-" 
 				 + this.endDate.getYear() + "', '%d-%m-%Y'));";
-		System.out.println(sqlCmd);
-		this.sqlCom.commitUpdate(sqlCmd);
+		
+		try {
+			this.sqlCom.commitUpdate(sqlCmd);
+		} catch (SQLException e) {
+			if (e.getMessage().contains("a foreign key constraint fails"))
+				throw new Exception("The user ID you provided does not exist");
+			else throw e;
+		}
 	
 	}
 	

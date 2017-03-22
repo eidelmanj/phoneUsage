@@ -1,5 +1,9 @@
 package com.KnowRoaming;
 import java.security.SecureRandom;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.math.BigInteger;
 
 /*                                                                                                                                                                                                          
@@ -18,6 +22,29 @@ public class UserRecord implements SQLRecord {
     this.uniqueId = generateUniqueId();
     this.sqlCom = sqlCom;
 
+    }
+    
+    // Creates a UserRecord object that retrieves a User that already exists within the database
+    public UserRecord(String id, SQLCommunicator sqlCom) throws Exception {
+    	String sqlQuery = "SELECT * FROM user_records WHERE"
+    			+ " unique_id = \"" + id + "\"";
+    	
+    	ResultSet rSet = sqlCom.executeQuery(sqlQuery);
+    	
+    	
+    	// Since User ID's are unique, there can only be one result
+    	boolean nonEmpty = rSet.next();
+    	if (!nonEmpty) {
+    		throw new NonExistentUserException("There is no user with id " + id, id);
+    	}
+    	String qName, qEmail, qPhoneNumber;
+    	qName = rSet.getString("name");
+    	qEmail = rSet.getString("email");
+    	qPhoneNumber = rSet.getString("phone_number");
+    	
+    	if (qName != null) this.name = qName;
+    	if (qEmail != null) this.email = qEmail;
+    	if (qPhoneNumber != null) this.phoneNumber = qPhoneNumber;
     }
 
     public UserRecord() {
@@ -58,29 +85,60 @@ public class UserRecord implements SQLRecord {
 
     // TODO Should this be void?                                                                                                                                                                            
     // TODO Make a better Exception                                                                                                                                                                         
-    public void validate() throws Exception {
-	if (this.name == null) throw new Exception();
+    public void validate() throws InvalidArgumentException {
+	if (this.name == null) throw new InvalidArgumentException("name_null", "You must provide a name for the user");
 	
-    if (this.email == null) throw new Exception();
-    if (this.phoneNumber == null) throw new Exception();
+    if (this.email == null) throw new InvalidArgumentException("email_null", "You must provide an email address");
+    if (this.phoneNumber == null) throw new InvalidArgumentException("phoneNumber_null", "You must provide a phone number");
 
-    if (!validName(this.name)) throw new Exception();
-    if (!validEmail(this.email)) throw new Exception();
-    if (!validPhoneNumber(this.phoneNumber)) throw new Exception();
+    if (!validName(this.name)) throw new InvalidArgumentException("name_invalid", "Invalid name");
+    if (!validEmail(this.email)) throw new InvalidArgumentException("email_invalid", "Invalid email");
+    if (!validPhoneNumber(this.phoneNumber)) throw new InvalidArgumentException("phoneNumber_invalid", "Invalid phone number");
 }
 
 
+public ArrayList<UsageRecord> findAllRecords(LocalDate startDate, LocalDate endDate) {
+	ArrayList<UsageRecord> recordList = new ArrayList<UsageRecord>();
+	
+	String sqlCmd =
+	       "SELECT * FROM usage_records WHERE user_ID = " + this.getUserId()
+	       		+ " AND start_date > " + 
+	       		"STR_TO_DATE('"+startDate.getDayOfMonth()+"-" 
+			 	+ startDate.getMonthValue() + "-" 
+			 	+ startDate.getYear() + "', '%d-%m-%Y')" 
+			 	+ " AND end_date < "  
+	       		+ "STR_TO_DATE('"+endDate.getDayOfMonth()+"-" 
+			 	+ startDate.getMonthValue() + "-" 
+			 	+ startDate.getYear() + "', '%d-%m-%Y')";
+	try {
+		this.sqlCom.executeQuery(sqlCmd);
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return recordList;
+}
 
 // TODO Make better exception                                                                                                                                                                           
 public void commit() throws Exception {
 
     this.validate();
     String sqlCmd =
-        "INSERT INTO user_records (ID, unique_id, name, email, phone_number) VALUES (DEFAULT, \"" +
-        this.uniqueId + "\", \"" + this.name + "\", \"" + this.email + "\", \"" + this.phoneNumber + "\");";
+        "INSERT INTO user_records (unique_id, name, email, phone_number) VALUES (" 
+        + "\"" + this.uniqueId + "\", \"" + this.name + "\", \"" + this.email + "\", \"" + this.phoneNumber + "\");";
 
-    this.sqlCom.commitUpdate(sqlCmd);
+    try {
+    	this.sqlCom.commitUpdate(sqlCmd);
+    } catch (SQLException e) {
+    	if (e.getMessage().contains("Duplicate entry") && e.getMessage().contains("email")) {
+    		throw new InvalidArgumentException("email_taken", "That email address is taken");
+    	}
+    }
 }
+
+
+
 
 
 private String generateUniqueId() {
