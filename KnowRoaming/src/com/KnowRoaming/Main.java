@@ -163,7 +163,7 @@ public class Main {
 		try {
 			// Retrieve DB configuration information from 
 			// settings.txt file
-			fr = new FileReader("settings.txt");
+			fr = new FileReader(fname);
 			br = new BufferedReader(fr);
 			
 			String usernameConfig = br.readLine();
