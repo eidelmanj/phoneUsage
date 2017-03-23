@@ -44,6 +44,30 @@ java -jar KnowRoaming.jar
 ```
 
 
+KnowRoaming App Commands
+-------------------------
+There are three commands in the KnowRoaming APP
+```
+NEWUSER name email phoneNumber
+```
+This command creates a new user with the given name, email and phone number in the database. If successful, this command will spit out the unique 10 character ID of the user. Otherwise it will give an error message
+
+
+```
+USAGE userId dd-MM-yyyy dataType
+```
+This command enters a new usage record into the database. The new usage record is associated with a particular user identified by userId, has the time stamp given in the date and can have any allowable dataType. By default, the database is preset with the following datatypes:
+
+-SMS
+-ALL
+-DATA
+-VOICE
+
+
+```
+SHOW userId FROM dd-MM-yyyy TO dd-MM-yyyy
+```
+This command will spit out all usage records associated with the user identified by user_id between the first date given and the last date given. 
 
 
 
