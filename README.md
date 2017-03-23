@@ -27,6 +27,9 @@ Where "USERNAME" is your mysql username.
 Finally, update the settings.txt file to reflect your MySQL settings.  The first line should be your MySQL username. The second line should be your MySQL password. The third line should be the database name (knowroaming_eidelman by default).
 
 
+Running the Project
+----------------------
+
 This project is packaged as an Eclipse project. In Eclipse, go to
 ```
 file menu -> import -> Existing Projects into Workspace
