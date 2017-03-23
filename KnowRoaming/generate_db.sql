@@ -3,6 +3,8 @@ DROP TABLE IF EXISTS usage_records;
 DROP TABLE IF EXISTS data_types;
 DROP TABLE IF EXISTS user_records;
 
+
+
 CREATE TABLE user_records (
 --       ID int NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	   
