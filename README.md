@@ -58,10 +58,10 @@ USAGE userId dd-MM-yyyy dataType
 ```
 This command enters a new usage record into the database. The new usage record is associated with a particular user identified by userId, has the time stamp given in the date and can have any allowable dataType. By default, the database is preset with the following datatypes:
 
--SMS
--ALL
--DATA
--VOICE
+- SMS
+- ALL
+- DATA
+- VOICE
 
 
 ```
