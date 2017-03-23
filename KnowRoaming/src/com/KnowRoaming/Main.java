@@ -154,6 +154,10 @@ public class Main {
 		FileReader fr = null;
 		
 		
+		String fname = "settings.txt";
+		if (args.length > 1) {
+			fname = args[1];
+		}
 		
 		try {
 			// Retrieve DB configuration information from 
