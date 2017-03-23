@@ -156,9 +156,10 @@ public class Main {
 		
 		String fname = "settings.txt";
 		if (args.length > 1) {
+			
 			fname = args[1];
 		}
-		
+		System.out.println(fname);
 		try {
 			// Retrieve DB configuration information from 
 			// settings.txt file
