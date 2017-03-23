@@ -2,6 +2,9 @@ package com.KnowRoaming;
 
 import com.KnowRoaming.SQLCommunicator;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -20,6 +23,7 @@ import java.util.Scanner;
 
 public class InputReader {
 	
+
 	
 	//Print Usage Information List
 	public static void printUsageList(ArrayList<UsageRecord> l) {
@@ -32,7 +36,11 @@ public class InputReader {
 		}
 	}
 	
-	// Parse User Input, and execute given command
+	/**
+	 * Simple parser for our three commands 
+	 * @param inStr
+	 * @param sqlCom
+	 */
 	public static void parseAndExecute(String inStr, SQLCommunicator sqlCom) {
 		String[] inputParts = inStr.split(" "); // Split string into command and arguments
 		
@@ -49,8 +57,9 @@ public class InputReader {
 				
 			}
 				
-			UserRecord r = new UserRecord(inputParts[2], inputParts[3], inputParts[4], sqlCom);
+			
 			try {
+				UserRecord r = new UserRecord(inputParts[2], inputParts[3], inputParts[4], sqlCom);
 				r.commit();
 				System.out.println(r.getUserId());
 			} catch (Exception e) {
@@ -120,12 +129,30 @@ public class InputReader {
 		SQLCommunicator sqlCom = null;
 		Scanner reader = new Scanner(System.in); 
 		
-		// Establish a connection
+		
+		BufferedReader br = null;
+		FileReader fr = null;
+		
+		
+		
 		try {
-			sqlCom = new SQLCommunicator("root", "root", "knowroaming");
-
+			// Retrieve DB configuration information from 
+			// settings.txt file
+			fr = new FileReader("settings.txt");
+			br = new BufferedReader(fr);
+			
+			String usernameConfig = br.readLine();
+			String pswdConfig = br.readLine();
+			String dbNameConfig = br.readLine();
+	
+			// Establish a connection with the DB
+			sqlCom = new SQLCommunicator(usernameConfig, pswdConfig, dbNameConfig);
 
 			
+		} catch (IOException e) {
+			System.err.println("Error reading settings.txt");
+			e.printStackTrace();
+			System.exit(-1);
 		} catch(Exception e) {
 			System.err.println("Error connecting to MySQL DB");
 			e.printStackTrace();
