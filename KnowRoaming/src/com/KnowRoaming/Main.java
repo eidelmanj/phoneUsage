@@ -155,9 +155,9 @@ public class Main {
 		
 		
 		String fname = "settings.txt";
-		if (args.length > 1) {
+		if (args.length > 0) {
 			
-			fname = args[1];
+			fname = args[0];
 		}
 		System.out.println(fname);
 		try {
