@@ -118,7 +118,7 @@ public class Tests {
 		UserRecord uRecord = null;
 		try {
 			uRecord = new UserRecord("test", "check@test.com", "123-456", sqlCom);
-			uRecord.commit(); 
+			uRecord.commitNew(); 
 		}  catch(Exception e) {
 			// There should not be any errors
 			e.printStackTrace(); 
@@ -139,7 +139,7 @@ public class Tests {
 		
 		UserRecord uRecordDuplicate = new UserRecord("abc", "check@test.com", "5555", sqlCom);
 		exception.expect(InvalidArgumentException.class);
-		uRecordDuplicate.commit();
+		uRecordDuplicate.commitNew();
 
 		
 	}

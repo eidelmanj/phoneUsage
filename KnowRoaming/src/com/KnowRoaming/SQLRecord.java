@@ -14,6 +14,6 @@ public interface SQLRecord {
 	 * primary key of this instance
 	 * @throws Exception If the primary key of this instance is already in the DB
 	 */
-	public void commit() throws Exception;
+	public void commitNew() throws Exception;
 
 }

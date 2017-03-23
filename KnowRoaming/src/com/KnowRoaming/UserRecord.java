@@ -217,7 +217,7 @@ public class UserRecord implements SQLRecord {
 	 * specifications before committing
 	 * @throws Exception If there is already an entry in the DB for a user with the same email address
 	 */
-	public void commit() throws Exception {
+	public void commitNew() throws Exception {
 
 		this.validate();
 		String sqlCmd = "INSERT INTO user_records (unique_id, name, email, phone_number) VALUES (" + "\""

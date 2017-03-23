@@ -43,7 +43,7 @@ public class Main {
 
 			
 			UsageRecord r = new UsageRecord(id, timeStamp, dataStr, sqlCom );
-			r.commit();
+			r.commitNew();
 			
 			
 		} 
@@ -59,7 +59,7 @@ public class Main {
 	private static void runNewUser(String name, String email, String phoneNumber, SQLCommunicator sqlCom) {
 		try {
 			UserRecord r = new UserRecord(name, email, phoneNumber, sqlCom);
-			r.commit();
+			r.commitNew();
 			System.out.println(r.getUserId());
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

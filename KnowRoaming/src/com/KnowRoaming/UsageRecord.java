@@ -84,7 +84,7 @@ public class UsageRecord implements SQLRecord {
 	 * @throws Exception If commit fails. This should only happen if the User ID
 	 *         does not exist.
 	 */
-	public void commit() throws Exception {
+	public void commitNew() throws Exception {
 		this.validate();
 	
 		String sqlCmd =

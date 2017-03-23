@@ -1,3 +1,4 @@
+
 User Phone Record Database
 ==========================
 
@@ -28,3 +29,7 @@ Where "USERNAME" is your mysql username.
 
 Finally, update the settings.txt file to reflect your MySQL settings. The first line should be the database name. The second line should be your MySQL username. The third line should be your MySQL password.
 
+
+
+Design Decisions
+------------------
