@@ -31,22 +31,18 @@ public class SQLCommunicator {
      * Connects to database associated with the current SQLCommunicator instance
      * If this fails, we print the stack-trace, since there is no elegant way to continue 
      * execution without access to the DB.
+     * @throws ClassNotFoundException If we are missing the JDBC driver
+     * @throws SQLException If SQL connection fails
      */
-    private void connectSQL() {	
-    	try{
+    private void connectSQL() throws SQLException, ClassNotFoundException {	
+
 
     		//STEP 2: Register JDBC driver                                                                                                                                                                  
   	  		Class.forName("com.mysql.jdbc.Driver");
 
   	  		//STEP 3: Open a connection                                                                                                                                                                     
   	  		this.conn = DriverManager.getConnection(this.dbUrl, this.uname, this.pswd);
-    	}  catch(SQLException se){
-        	//Handle errors for JDBC                                                                                                                                                                        
-            se.printStackTrace();
-        }catch(Exception e){
-            //Handle errors for Class.forName                                                                                                                                                               
-            e.printStackTrace();
-        }
+
     }
     
     /**

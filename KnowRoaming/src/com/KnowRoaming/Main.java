@@ -46,7 +46,9 @@ public class Main {
 			r.commit();
 			
 			
-		} catch (DateTimeParseException e) {
+		} 
+		
+		catch (DateTimeParseException e) {
 			System.out.println("Incorrect date format! Please use 'dd-MM-yyyy'");
 		}catch (Exception e) {
 		
@@ -165,13 +167,15 @@ public class Main {
 			sqlCom = new SQLCommunicator(usernameConfig, pswdConfig, dbNameConfig);
 
 			
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			System.err.println("Error reading settings.txt");
-			e.printStackTrace();
+			//e.printStackTrace();
 			System.exit(-1);
 		} catch(Exception e) {
+			// Note: It seems that rather than throwing 
 			System.err.println("Error connecting to MySQL DB");
-			e.printStackTrace();
+			//e.printStackTrace();
 			System.exit(-1);
 		}
 		
