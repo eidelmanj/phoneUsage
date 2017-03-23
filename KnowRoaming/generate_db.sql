@@ -1,4 +1,5 @@
-USE knowroaming;
+CREATE DATABASE IF NOT EXISTS knowroaming_eidelman;
+USE knowroaming_eidelman;
 DROP TABLE IF EXISTS usage_records;
 DROP TABLE IF EXISTS data_types;
 DROP TABLE IF EXISTS user_records;
