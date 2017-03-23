@@ -30,9 +30,9 @@ public class Main {
 		if (l.isEmpty())
 			System.out.println("There are no usage records in the time period requested");
 		for (UsageRecord uRecord : l) {
-			System.out.println("(user: " + uRecord.userId +", time_stamp: " 
-		+ uRecord.timeStamp.toString()  + ", "
-				+ "data_type: "+ uRecord.dataType + ")");
+			System.out.println("(user: " + uRecord.getUserId() +", time_stamp: " 
+		+ uRecord.getTimeStamp().toString()  + ", "
+				+ "data_type: "+ uRecord.getDataType() + ")");
 		}
 	}
 	
@@ -80,7 +80,7 @@ public class Main {
 			
 			
 			
-		} catch (NonExistentUserException e) {
+		} catch (NonExistentRecordException e) {
 			System.out.println(e.getMessage());
 			
 		} catch (DateTimeParseException e) {
