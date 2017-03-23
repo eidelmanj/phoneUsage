@@ -18,7 +18,7 @@ import java.math.BigInteger;
  * 
  * @author Jonathan Eidelman
  */
-public class UserRecord implements SQLRecord {
+public class UserRecord implements SQLRecord<String> {
 
 	private SQLCommunicator sqlCom;
 	private SecureRandom random = new SecureRandom();
@@ -51,8 +51,8 @@ public class UserRecord implements SQLRecord {
 	}
 
 	/**
-	 * This constructor assumes that
-	 * 
+	 * This constructor assumes that there is already a user record in the DB
+	 * and constructs an instance to match that user record
 	 * @param id
 	 *            The unique identifier
 	 * @param sqlCom
@@ -65,27 +65,7 @@ public class UserRecord implements SQLRecord {
 		if (sqlCom == null)
 			throw new Exception("You must pass a valid SQLCommunicator object");
 		this.sqlCom = sqlCom;
-		String sqlQuery = "SELECT * FROM user_records WHERE" + " unique_id = \"" + id + "\"";
-
-		ResultSet rSet = sqlCom.executeQuery(sqlQuery);
-
-		// Since User ID's are unique, there can only be one result
-		boolean nonEmpty = rSet.next();
-		if (!nonEmpty) {
-			throw new NonExistentUserException("There is no user with id " + id, id);
-		}
-		String qName, qEmail, qPhoneNumber;
-		qName = rSet.getString("name");
-		qEmail = rSet.getString("email");
-		qPhoneNumber = rSet.getString("phone_number");
-
-		if (qName != null)
-			this.name = qName;
-		if (qEmail != null)
-			this.email = qEmail;
-		if (qPhoneNumber != null)
-			this.phoneNumber = qPhoneNumber;
-		this.uniqueId = id;
+		this.constructFromPrimaryKey(id);
 	}
 
 	/**
@@ -180,14 +160,18 @@ public class UserRecord implements SQLRecord {
 	 * @return An ArrayList containing all UsageRecords in the DB associated with
 	 * 		      this user, and with start dates > startDate and
 	 *            end dates < endDate
+	 * @throws InvalidArgumentException If startDate is after endDate
 	 */
-	public ArrayList<UsageRecord> findAllRecords(LocalDate startDate, LocalDate endDate) {
+	public ArrayList<UsageRecord> findAllRecords(LocalDate startDate, LocalDate endDate) throws InvalidArgumentException {
+		if (startDate.isAfter(endDate)) 
+			throw new InvalidArgumentException("invalid_dates", "Start date must be before end date");
+		
 		ArrayList<UsageRecord> recordList = new ArrayList<UsageRecord>();
 
 		String sqlCmd = "SELECT usage_records.time_stamp, data_types.tp_name"
 				+ " FROM usage_records JOIN data_types ON usage_records.tp_ID = data_types.ID" + " WHERE user_ID = \""
-				+ this.getUserId() + "\"" + " AND usage_records.time_stamp > " + this.sqlCom.DateToString(startDate)
-				+ " AND usage_records.time_stamp < " + this.sqlCom.DateToString(endDate);
+				+ this.getUserId() + "\"" + " AND usage_records.time_stamp >= " + this.sqlCom.DateToString(startDate)
+				+ " AND usage_records.time_stamp <= " + this.sqlCom.DateToString(endDate);
 
 		try {
 
@@ -232,6 +216,54 @@ public class UserRecord implements SQLRecord {
 		}
 	}
 
+	/**
+	 * Commits an update to the DB to match this UserRecord instance
+	 * Assumes that there is already a row in the DB associated with the unique ID
+	 * of this User. 
+	 * @throws Exception If update query application fails
+	 */
+	public void commitUpdate() throws Exception {
+		this.validate();
+		String sqlCmd = "UPDATE user_records SET "
+				+ " name = '" + this.name + "', email = '" + this.email + "', phone_number ='" + this.phoneNumber + "'"
+				+ " WHERE unique_ID = '" + this.uniqueId + "';";
+
+
+		this.sqlCom.commitUpdate(sqlCmd);
+
+	}
+	
+	/**
+	 * Fills all the field in this object to match the DB entry associated with user unique id
+	 * @param key The primary key associated with the user record in the DB we are interested in
+	 * @throws Exception If there is a problem executing SQL query
+	 * @throws NonExistentRecordException If there is not user record associated with this unique key
+	 */
+	public void constructFromPrimaryKey(String key) throws Exception {
+		if (sqlCom == null)
+			throw new Exception("You must pass a valid SQLCommunicator object");
+
+		String sqlQuery = "SELECT * FROM user_records WHERE" + " unique_id = \"" + key + "\"";
+
+		ResultSet rSet = sqlCom.executeQuery(sqlQuery);
+
+		// Since User ID's are unique, there can only be one result
+		boolean nonEmpty = rSet.next();
+		if (!nonEmpty) {
+			throw new NonExistentRecordException("There is no user with id " + key, key);
+		}
+		String qName, qEmail, qPhoneNumber;
+		qName = rSet.getString("name");
+		qEmail = rSet.getString("email");
+		qPhoneNumber = rSet.getString("phone_number");
+
+	
+		this.name = qName;
+		this.email = qEmail;
+		this.phoneNumber = qPhoneNumber;
+		this.uniqueId = key;
+	}
+	
 
 	/**
 	 * Getter for name field
@@ -263,6 +295,24 @@ public class UserRecord implements SQLRecord {
 	 */
 	public String getUserId() {
 		return this.uniqueId;
+	}
+	
+	// Setters for private fields
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public void setUserId(String uId) {
+		this.uniqueId = uId;
+	}
+	
+	public void setEmail(String email)  {
+		this.email = email;
+	}
+	
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
 
 }

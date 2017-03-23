@@ -3,11 +3,14 @@ package com.KnowRoaming;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
+
 
 
 /**
@@ -77,9 +80,19 @@ public class SQLCommunicator {
      * @param updateStr, the SQL query we wish to run
      * @throws Exception , if DB update fails
      */
-    public void commitUpdate(String updateStr) throws Exception {
-    	Statement stmt = conn.createStatement();
-    	stmt.executeUpdate(updateStr);
+    public Object commitUpdate(String updateStr) throws Exception {
+    	PreparedStatement pInsertOid = conn.prepareStatement(updateStr, Statement.RETURN_GENERATED_KEYS);
+    	/*Statement stmt = conn.createStatement();
+    	stmt.executeUpdate(updateStr);*/
+    	
+    	pInsertOid.executeUpdate();
+    	ResultSet rs = pInsertOid.getGeneratedKeys();
+    	if (rs.next()) {
+    	  int newId = rs.getInt(1);
+    	  return new Integer(newId);
+    	}
+    	
+    	return null;
     }
     
     /**

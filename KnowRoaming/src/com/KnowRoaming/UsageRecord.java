@@ -11,10 +11,13 @@ import java.util.Date;
  * @author Jonathan Eidelman
  *
  */
-public class UsageRecord implements SQLRecord {
-	SQLCommunicator sqlCom;
-	String userId, dataType;
-	LocalDate timeStamp;
+public class UsageRecord implements SQLRecord<Integer> {
+	private SQLCommunicator sqlCom;
+	private String userId, dataType;
+	private LocalDate timeStamp;
+	private Integer primaryKey;
+	
+	
 	
 	/**
 	 * Constructor for new UsageRecord entry. The assumption is that this entry does not
@@ -35,17 +38,17 @@ public class UsageRecord implements SQLRecord {
 		this.sqlCom = sqlCom;
 	}
 	
-	
 	/**
-	 * Validates dates for this object to guarantee that start date is
-	 * before end date
-	 * @return true if dates are valid, false otherwise
-	 */ /*
-	private boolean validDates() {
-		if (startDate.isAfter(endDate)) return false;
-		if (endDate.isBefore(startDate)) return false;
-		return true;
-	}*/
+	 * Constructs a new UsageRecord entry where all fields are left null except the SQL object
+	 * This is meant to be an empty object that will be filled using a database read call at a later
+	 * time
+	 * @param sqlCom SQLCommunicator to be associated with this instance
+	 */
+	public UsageRecord(SQLCommunicator sqlCom) {
+		this.sqlCom = sqlCom;
+	}
+	
+
 	
 	/**
 	 * Validates dataType entry for this object to guarantee it is a dataType that
@@ -73,6 +76,7 @@ public class UsageRecord implements SQLRecord {
 	 * @throws InvalidArgumentException If there is a field that is not valid
 	 */
 	void validate() throws InvalidArgumentException {
+
 		// if (!validDates()) throw new InvalidArgumentException("dates_invalid", "Your start date cannot be after your end date");
 		if (!validData()) 
 			throw new InvalidArgumentException("datatype_invalid", "Please choose from the given data type options (DATA, VOICE, ALL, SMS)");
@@ -94,6 +98,40 @@ public class UsageRecord implements SQLRecord {
 			 + "(SELECT ID FROM data_types WHERE tp_name = \"" + this.dataType + "\"),"
 			 + this.sqlCom.DateToString(this.timeStamp) +");";
 		
+		
+		
+		try {
+			Integer primKey = (Integer) this.sqlCom.commitUpdate(sqlCmd);
+			if (primKey != null) this.primaryKey = primKey;
+			
+			
+			
+		} catch (SQLException e) {
+			// The SQL default message is not very useful when the foreign key isn't found
+			// so I have replaced it
+			if (e.getMessage().contains("a foreign key constraint fails"))
+				throw new Exception("The user ID you provided does not exist");
+			else throw e;
+		}
+	
+	}
+	
+	/**
+	 * Validates all fields and updates an existing row in the DB to match
+	 * this instance. If there is no such row, this will throw an exception
+	 * @throws Exception If the record you want to update does not exist
+	 */
+	public void commitUpdate() throws Exception {
+		if (this.primaryKey == null) throw new InvalidArgumentException("null_primary", "There is no primary key "
+				+ "associated with this instance");
+		this.validate();
+		
+		String sqlCmd =
+			 "UPDATE usage_records SET "
+			 + "tp_ID = (SELECT ID FROM data_types WHERE tp_name = \"" + this.dataType + "\"),"
+			 + "time_stamp = " + this.sqlCom.DateToString(this.timeStamp) 
+			 + " WHERE usage_records.ID = '" + this.primaryKey + "';";
+		// System.out.println(sqlCmd);
 		try {
 			this.sqlCom.commitUpdate(sqlCmd);
 		} catch (SQLException e) {
@@ -103,7 +141,73 @@ public class UsageRecord implements SQLRecord {
 				throw new Exception("The user ID you provided does not exist");
 			else throw e;
 		}
+	}
 	
+	/**
+	 * Retrieves record in the DB associated with a primary key and updates the fields of this instance
+	 * to match that record.
+	 * @param key The primary key of the record we wish to take from the DB
+	 * @throws NonExistentRecordException If there is no record associated with key
+	 * @throws Exception If there is an error executing SQL query
+	 */
+	public void constructFromPrimaryKey(Integer key) throws NonExistentRecordException, Exception {
+
+		String sqlQuery = "SELECT usage_records.user_ID, usage_records.time_stamp, data_types.tp_name"
+				+ "  FROM usage_records JOIN data_types ON usage_records.tp_ID = data_types.ID"
+				+ " WHERE" + " usage_records.ID = " + key.toString();
+		// System.out.println(sqlQuery);
+		ResultSet rSet = sqlCom.executeQuery(sqlQuery);
+
+		// Since User ID's are unique, there can only be one result
+		boolean nonEmpty = rSet.next();
+		if (!nonEmpty) {
+			throw new NonExistentRecordException("There is no user with id " + key.toString(), key.toString());
+		}
+		String qUserId, qDataType;
+		LocalDate qTimeStamp;
+		
+		qUserId = rSet.getString("user_ID");
+		qDataType = rSet.getString("tp_name");
+		qTimeStamp = rSet.getDate("time_stamp").toLocalDate();
+		
+		if (qUserId != null) 
+			this.userId = qUserId;
+		if (qDataType != null)
+			this.dataType = qDataType;
+		if (qTimeStamp != null)
+			this.timeStamp = qTimeStamp;
+	}
+	
+	
+	/* Getters for private fields */
+	public LocalDate getTimeStamp() {
+		return this.timeStamp;
+	}
+	
+	public String getDataType() {
+		return this.dataType;
+	}
+	
+	public String getUserId() {
+		return this.userId;
+	}
+	
+	public Integer getPrimaryKey() {
+		return this.primaryKey;
+	}
+	
+	
+	/* Setters for private fields */
+	public void setTimeStamp(LocalDate d) {
+		this.timeStamp = d;
+	}
+	
+	public void setDataType(String str) {
+		this.dataType = str;
+	}
+	
+	public void setUserId(String str) {
+		this.userId = str;
 	}
 	
 	
