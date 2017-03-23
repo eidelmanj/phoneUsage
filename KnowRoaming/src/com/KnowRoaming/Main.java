@@ -30,19 +30,19 @@ public class Main {
 		if (l.isEmpty())
 			System.out.println("There are no usage records in the time period requested");
 		for (UsageRecord uRecord : l) {
-			System.out.println("(user: " + uRecord.userId +", start_date: " 
-		+ uRecord.startDate.toString() + ", end_date: " + uRecord.endDate.toString() + ", "
+			System.out.println("(user: " + uRecord.userId +", time_stamp: " 
+		+ uRecord.timeStamp.toString()  + ", "
 				+ "data_type: "+ uRecord.dataType + ")");
 		}
 	}
 	
-	private static void runNewUsage(String id, String startDateStr,
-			String endDateStr, String dataStr, SQLCommunicator sqlCom) {
+	private static void runNewUsage(String id, 
+			String timeStampStr, String dataStr, SQLCommunicator sqlCom) {
 		try {
-			LocalDate startDate = LocalDate.parse(startDateStr, DATE_FORMAT);
-			LocalDate endDate = LocalDate.parse(endDateStr, DATE_FORMAT);
+			LocalDate timeStamp = LocalDate.parse(timeStampStr, DATE_FORMAT);
+
 			
-			UsageRecord r = new UsageRecord(id, startDate, endDate, dataStr, sqlCom );
+			UsageRecord r = new UsageRecord(id, timeStamp, dataStr, sqlCom );
 			r.commit();
 			
 			
@@ -113,12 +113,12 @@ public class Main {
 		}
 		
 		else if (inputParts[0].equals("USAGE")) {
-			if (inputParts.length < 5) {
-				System.out.println("Incorrect usage: NEW USAGE userId startDate endDate dataType");
+			if (inputParts.length < 4) {
+				System.out.println("Incorrect usage: NEW USAGE userId timeStamp dataType");
 				return;
 			}
 			
-			runNewUsage(inputParts[1], inputParts[2], inputParts[3], inputParts[4], sqlCom);
+			runNewUsage(inputParts[1], inputParts[2],inputParts[3], sqlCom);
 			
 		
 

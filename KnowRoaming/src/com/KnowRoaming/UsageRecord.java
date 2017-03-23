@@ -14,7 +14,7 @@ import java.util.Date;
 public class UsageRecord implements SQLRecord {
 	SQLCommunicator sqlCom;
 	String userId, dataType;
-	LocalDate startDate, endDate;
+	LocalDate timeStamp;
 	
 	/**
 	 * Constructor for new UsageRecord entry. The assumption is that this entry does not
@@ -26,26 +26,26 @@ public class UsageRecord implements SQLRecord {
 	 * @param dataType Data 
 	 * @param sqlCom
 	 */
-	public UsageRecord(String userId, LocalDate startDate, LocalDate endDate, String dataType, 
+	public UsageRecord(String userId, LocalDate timeStamp, String dataType, 
 			SQLCommunicator sqlCom) {
 		
 		this.userId = userId;
-		this.startDate = startDate;
-		this.endDate = endDate;
+		this.timeStamp = timeStamp;
 		this.dataType = dataType;
 		this.sqlCom = sqlCom;
 	}
+	
 	
 	/**
 	 * Validates dates for this object to guarantee that start date is
 	 * before end date
 	 * @return true if dates are valid, false otherwise
-	 */
+	 */ /*
 	private boolean validDates() {
 		if (startDate.isAfter(endDate)) return false;
 		if (endDate.isBefore(startDate)) return false;
 		return true;
-	}
+	}*/
 	
 	/**
 	 * Validates dataType entry for this object to guarantee it is a dataType that
@@ -73,7 +73,7 @@ public class UsageRecord implements SQLRecord {
 	 * @throws InvalidArgumentException If there is a field that is not valid
 	 */
 	void validate() throws InvalidArgumentException {
-		if (!validDates()) throw new InvalidArgumentException("dates_invalid", "Your start date cannot be after your end date");
+		// if (!validDates()) throw new InvalidArgumentException("dates_invalid", "Your start date cannot be after your end date");
 		if (!validData()) 
 			throw new InvalidArgumentException("datatype_invalid", "Please choose from the given data type options (DATA, VOICE, ALL, SMS)");
 		
@@ -88,12 +88,11 @@ public class UsageRecord implements SQLRecord {
 		this.validate();
 	
 		String sqlCmd =
-			 "INSERT INTO usage_records (ID, user_ID, tp_ID, start_date, end_date) VALUES"
+			 "INSERT INTO usage_records (ID, user_ID, tp_ID, time_stamp) VALUES"
 			 + "(DEFAULT,"
 			 + "\"" + this.userId + "\","
 			 + "(SELECT ID FROM data_types WHERE tp_name = \"" + this.dataType + "\"),"
-			 + this.sqlCom.DateToString(this.startDate) + ", "
-			 + this.sqlCom.DateToString(this.endDate) +");";
+			 + this.sqlCom.DateToString(this.timeStamp) +");";
 		
 		try {
 			this.sqlCom.commitUpdate(sqlCmd);

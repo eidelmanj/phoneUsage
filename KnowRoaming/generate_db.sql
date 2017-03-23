@@ -22,8 +22,9 @@ CREATE TABLE usage_records (
        ID int NOT NULL PRIMARY KEY AUTO_INCREMENT,
        user_ID VARCHAR(20) NOT NULL,
        tp_ID int NOT NULL,
-       start_date date,
-       end_date date,
+ --      start_date date,
+ --      end_date date,
+ 	   time_stamp date,
        FOREIGN KEY (user_ID) REFERENCES user_records(unique_id),
        FOREIGN KEY (tp_ID) REFERENCES data_types(ID)
        );

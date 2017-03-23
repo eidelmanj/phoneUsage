@@ -184,20 +184,20 @@ public class UserRecord implements SQLRecord {
 	public ArrayList<UsageRecord> findAllRecords(LocalDate startDate, LocalDate endDate) {
 		ArrayList<UsageRecord> recordList = new ArrayList<UsageRecord>();
 
-		String sqlCmd = "SELECT usage_records.start_date, usage_records.end_date, data_types.tp_name"
+		String sqlCmd = "SELECT usage_records.time_stamp, data_types.tp_name"
 				+ " FROM usage_records JOIN data_types ON usage_records.tp_ID = data_types.ID" + " WHERE user_ID = \""
-				+ this.getUserId() + "\"" + " AND start_date > " + this.sqlCom.DateToString(startDate)
-				+ " AND end_date < " + this.sqlCom.DateToString(endDate);
+				+ this.getUserId() + "\"" + " AND usage_records.time_stamp > " + this.sqlCom.DateToString(startDate)
+				+ " AND usage_records.time_stamp < " + this.sqlCom.DateToString(endDate);
 
 		try {
 
 			ResultSet rSet = this.sqlCom.executeQuery(sqlCmd);
 			while (rSet.next()) {
-				LocalDate curStartDate = rSet.getDate("start_date").toLocalDate();
-				LocalDate curEndDate = rSet.getDate("end_date").toLocalDate();
+				LocalDate curTimeStamp = rSet.getDate("time_stamp").toLocalDate();
+
 				String dataType = rSet.getString("tp_name");
 
-				recordList.add(new UsageRecord(this.uniqueId, curStartDate, curEndDate, dataType, this.sqlCom));
+				recordList.add(new UsageRecord(this.uniqueId, curTimeStamp, dataType, this.sqlCom));
 			}
 
 		} catch (Exception e) {
