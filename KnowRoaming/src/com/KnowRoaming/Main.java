@@ -116,7 +116,7 @@ public class Main {
 		
 		else if (inputParts[0].equals("USAGE")) {
 			if (inputParts.length < 4) {
-				System.out.println("Incorrect usage: NEW USAGE userId timeStamp dataType");
+				System.out.println("Incorrect usage: USAGE userId timeStamp dataType");
 				return;
 			}
 			
@@ -136,6 +136,8 @@ public class Main {
 			runGetUsageRecords(inputParts[1], inputParts[3], inputParts[5], sqlCom);
 			
 		}
+		else
+			System.out.println("Invalid command!");
 		
 	}
 	
@@ -180,6 +182,10 @@ public class Main {
 		}
 		
 		
+		System.out.println("Welcome to the KnowRoaming phone record app!");
+		System.out.println("Commands:\nNEWUSER name email phoneNumber");
+		System.out.println("USAGE userId dd-MM-yyyy dataType");
+		System.out.println("SHOW user_id FROM dd-MM-yyyy TO dd-MM-yyyy");
 		// Enter User Input Loop
 		while (true) {
 			
