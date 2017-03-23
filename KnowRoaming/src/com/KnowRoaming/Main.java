@@ -25,7 +25,10 @@ public class Main {
 	final static DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
 	
-	//Print Usage Information List
+	/**
+	 * Prints out usage information records in a reasonable format
+	 * @param l An ArrayList of UsageRecords that should not have any null fields
+	 */
 	public static void printUsageList(ArrayList<UsageRecord> l) {
 		if (l.isEmpty())
 			System.out.println("There are no usage records in the time period requested");
@@ -36,6 +39,13 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * Creates and commits a new UsageRecord in the database
+	 * @param id The unique ID of the user to be associated with this record
+	 * @param timeStampStr The string representation of the timestamp in the appropriate format
+	 * @param dataStr The string representation of the data type for this UsageRecord
+	 * @param sqlCom The SQLCommunication object
+	 */
 	private static void runNewUsage(String id, 
 			String timeStampStr, String dataStr, SQLCommunicator sqlCom) {
 		try {
@@ -56,6 +66,13 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * Creates and commits a new UserRecord with the appropriate values
+	 * @param name The name of the new user
+	 * @param email The email of the new user
+	 * @param phoneNumber The phone number (String) of the new user
+	 * @param sqlCom The current SQLCommunication object
+	 */
 	private static void runNewUser(String name, String email, String phoneNumber, SQLCommunicator sqlCom) {
 		try {
 			UserRecord r = new UserRecord(name, email, phoneNumber, sqlCom);
@@ -66,7 +83,13 @@ public class Main {
 		}
 	}
 	
-	
+	/**
+	 * Retrieves UsageRecords with the given parameters and then prints them out neatly
+	 * @param userId The unique ID of the user associated with these records
+	 * @param startDateStr The beginning of the date range we are interested in 
+	 * @param endDateStr The end of the date range we are interested in 
+	 * @param sqlCom The current SQLCommunication object 
+	 */
 	private static void runGetUsageRecords(String userId,
 			String startDateStr, String endDateStr, SQLCommunicator sqlCom) {
 		UserRecord r;
@@ -153,13 +176,13 @@ public class Main {
 		BufferedReader br = null;
 		FileReader fr = null;
 		
-		
+		// By default we look for settings.txt in the current folder
 		String fname = "settings.txt";
 		if (args.length > 0) {
-			
+			// User can provide a different settings file
 			fname = args[0];
 		}
-		System.out.println(fname);
+
 		try {
 			// Retrieve DB configuration information from 
 			// settings.txt file
@@ -199,7 +222,7 @@ public class Main {
 			
 			if (uInput.equals("exit")) break;
 			
-			
+			// Parse user input
 			parseAndExecute(uInput, sqlCom);
 		
 		}
