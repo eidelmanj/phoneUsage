@@ -61,7 +61,7 @@
         </java>
     </target>
     <target name="run">
-        <java classname="com.KnowRoaming.Main" failonerror="true" fork="yes">
+        <java classname="com.KnowRoaming.Main" failonerror="true" fork="no">
             <classpath refid="KnowRoaming.classpath"/>
         </java>
     </target>
