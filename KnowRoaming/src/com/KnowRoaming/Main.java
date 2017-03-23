@@ -21,8 +21,8 @@ import java.util.Scanner;
 
 
 
-public class InputReader {
-	
+public class Main {
+	final static DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
 	
 	//Print Usage Information List
@@ -36,6 +36,59 @@ public class InputReader {
 		}
 	}
 	
+	private static void runNewUsage(String id, String startDateStr,
+			String endDateStr, String dataStr, SQLCommunicator sqlCom) {
+		try {
+			LocalDate startDate = LocalDate.parse(startDateStr, DATE_FORMAT);
+			LocalDate endDate = LocalDate.parse(endDateStr, DATE_FORMAT);
+			
+			UsageRecord r = new UsageRecord(id, startDate, endDate, dataStr, sqlCom );
+			r.commit();
+			
+			
+		} catch (DateTimeParseException e) {
+			System.out.println("Incorrect date format! Please use 'dd-MM-yyyy'");
+		}catch (Exception e) {
+		
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	private static void runNewUser(String name, String email, String phoneNumber, SQLCommunicator sqlCom) {
+		try {
+			UserRecord r = new UserRecord(name, email, phoneNumber, sqlCom);
+			r.commit();
+			System.out.println(r.getUserId());
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	
+	private static void runGetUsageRecords(String userId,
+			String startDateStr, String endDateStr, SQLCommunicator sqlCom) {
+		UserRecord r;
+		try {
+			r = new UserRecord(userId, sqlCom);
+			LocalDate startDate = LocalDate.parse(startDateStr, DATE_FORMAT);
+			LocalDate endDate = LocalDate.parse(endDateStr, DATE_FORMAT);
+			ArrayList<UsageRecord> usageRList = r.findAllRecords(startDate, endDate);
+			
+			printUsageList(usageRList);
+			
+			
+			
+		} catch (NonExistentUserException e) {
+			System.out.println(e.getMessage());
+			
+		} catch (DateTimeParseException e) {
+			System.out.println("Incorrect date format! Please use 'dd-MM-yyyy'");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Simple parser for our three commands 
 	 * @param inStr
@@ -44,52 +97,31 @@ public class InputReader {
 	public static void parseAndExecute(String inStr, SQLCommunicator sqlCom) {
 		String[] inputParts = inStr.split(" "); // Split string into command and arguments
 		
-		final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		
 		if (inputParts.length == 0 ) return;
-		//for (int i =0 ; i< inputParts.length; i ++ ) System.out.println(inputParts[i]);
-		
-		
-		if (inputParts.length > 1 && inputParts[0].equals("NEW") && inputParts[1].equals("USER")) {
-			//System.out.println("in here");
-			if (inputParts.length < 5)  {
-				System.out.println("Incorrect usage: NEW USER name email phoneNumber\n");
-				return;
+
 				
+		if (inputParts[0].equals("NEWUSER")) {
+
+			if (inputParts.length < 4)  {
+				System.out.println("Incorrect usage: NEWUSER name email phoneNumber\n");
+				return;
 			}
 				
 			
-			try {
-				UserRecord r = new UserRecord(inputParts[2], inputParts[3], inputParts[4], sqlCom);
-				r.commit();
-				System.out.println(r.getUserId());
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-			}
+			runNewUser(inputParts[1], inputParts[2], inputParts[3], sqlCom);
 		}
 		
-		else if (inputParts.length > 1 && inputParts[0].equals("NEW") && inputParts[1].equals("USAGE")) {
-			if (inputParts.length < 6) {
+		else if (inputParts[0].equals("USAGE")) {
+			if (inputParts.length < 5) {
 				System.out.println("Incorrect usage: NEW USAGE userId startDate endDate dataType");
 				return;
 			}
 			
-			
+			runNewUsage(inputParts[1], inputParts[2], inputParts[3], inputParts[4], sqlCom);
 			
 		
-			try {
-				LocalDate startDate = LocalDate.parse(inputParts[3], DATE_FORMAT);
-				LocalDate endDate = LocalDate.parse(inputParts[4], DATE_FORMAT);
-				
-				UsageRecord r = new UsageRecord(inputParts[2], startDate, endDate, inputParts[5], sqlCom );
-				r.commit();
-				
-				
-			} catch (DateTimeParseException e) {
-				System.out.println("Incorrect date format! Please use 'dd-MM-yyyy'");
-			}catch (Exception e) {
-			
-				System.out.println(e.getMessage());
-			}
+
 		}
 		
 		else if (inputParts[0].equals("SHOW")) {
@@ -98,25 +130,9 @@ public class InputReader {
 				System.out.println("Incorrect usage: SHOW user_id FROM dd-MM-yyyy TO dd-MM-yyyy");
 				return;
 			}
-			try {
-				r = new UserRecord(inputParts[1], sqlCom);
-				LocalDate startDate = LocalDate.parse(inputParts[3], DATE_FORMAT);
-				LocalDate endDate = LocalDate.parse(inputParts[5], DATE_FORMAT);
-				ArrayList<UsageRecord> usageRList = r.findAllRecords(startDate, endDate);
-				
-				printUsageList(usageRList);
-				
-				
-				
-			} catch (NonExistentUserException e) {
-				System.out.println(e.getMessage());
-				
-			} catch (DateTimeParseException e) {
-				System.out.println("Incorrect date format! Please use 'dd-MM-yyyy'");
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-				e.printStackTrace();
-			}
+			
+			runGetUsageRecords(inputParts[1], inputParts[3], inputParts[5], sqlCom);
+			
 		}
 		
 	}
