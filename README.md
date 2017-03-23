@@ -78,3 +78,9 @@ Design Decisions
 ------------------
 I have implemented a simple framework to encapsulate interaction with the MySQL database. Each type of record in the Database (user_record, usage_record) has a class associated with it that implements the SQLRecord class. These records are able to commit themselves to the database, update records in the DB as well as update themselves to match a corresponding record in the DB.
 
+
+
+Testing
+----------------
+
+I have written JUnit tests to ensure the behaviour of this tool meets its specification. These tests are located in Tests.java. They require that the database be set up, and they should be run using the Eclipse JUnit plugin.
