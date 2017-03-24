@@ -120,6 +120,7 @@ public class Main {
 	 * @param sqlCom
 	 */
 	public static void parseAndExecute(String inStr, SQLCommunicator sqlCom) {
+		if (inStr.length() == 0) return; 
 		String[] inputParts = inStr.split(" "); // Split string into command and arguments
 		
 		
@@ -225,6 +226,14 @@ public class Main {
 			// Parse user input
 			parseAndExecute(uInput, sqlCom);
 		
+		}
+		
+		try {
+			sqlCom.close();
+		} catch (Exception e) {
+			System.err.println("Error closing SQL connection");
+			e.printStackTrace();
+			
 		}
 		
 		

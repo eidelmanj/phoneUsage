@@ -107,6 +107,54 @@ public class Tests {
 		
 		
 	} 
+	
+	
+	@Test
+	public void testEmailLength() throws InvalidArgumentException {
+		SQLCommunicator sqlCom = cleanDB();
+		UserRecord  uRecord = null;
+
+		try {
+			uRecord = new UserRecord("aa", "aaa@aa.comm"
+					+ "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm", "11", sqlCom);
+		} catch (Exception e) {
+			e.printStackTrace();
+			assert(false);
+		}
+		exception.expect(InvalidArgumentException.class);
+		uRecord.validate();
+	}
+	
+	
+	@Test
+	public void testPhoneNumberLength() throws InvalidArgumentException {
+		SQLCommunicator sqlCom = cleanDB();
+		UserRecord  uRecord = null;
+
+		try {
+			uRecord = new UserRecord("aa", "check@test.com", "11111111111111111111", sqlCom);
+		} catch (Exception e) {
+			e.printStackTrace();
+			assert(false);
+		}
+		exception.expect(InvalidArgumentException.class);
+		uRecord.validate();
+	}
+	
+	@Test
+	public void testNameLength() throws InvalidArgumentException {
+		SQLCommunicator sqlCom = cleanDB();
+		UserRecord  uRecord = null;
+
+		try {
+			uRecord = new UserRecord("aaaaaaaaaaaaaaaaaaaa", "check@test.com", "123-456", sqlCom);
+		} catch (Exception e) {
+			e.printStackTrace();
+			assert(false);
+		}
+		exception.expect(InvalidArgumentException.class);
+		uRecord.validate();
+	}
 
 	@Test
 	public void testNameRule() throws InvalidArgumentException {

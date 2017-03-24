@@ -76,6 +76,8 @@ public class UserRecord implements SQLRecord<String> {
 	private boolean validName() {
 		if (this.name == null)
 			return false;
+		if (this.name.length() >= 20)
+			return false;
 		for (int i = 0; i < this.name.length(); i++) {
 			if (!Character.isLetter(this.name.charAt(i)))
 				return false;
@@ -90,7 +92,10 @@ public class UserRecord implements SQLRecord<String> {
 	 * @return true if email is valid, false otherwise
 	 */
 	private boolean validEmail() {
-		if (this.name == null)
+		if (this.email == null)
+			return false;
+		
+		if (this.email.length() >= 50)
 			return false;
 		int atCharIdx = this.email.indexOf('@');
 		int periodCharIdx = this.email.lastIndexOf('.');
@@ -109,6 +114,8 @@ public class UserRecord implements SQLRecord<String> {
 	 * @return true if phone number is valid, false otherwise
 	 */
 	private boolean validPhoneNumber() {
+		if (this.phoneNumber == null) return false;
+		if (this.phoneNumber.length() >= 20) return false;
 		for (int i = 0; i < this.phoneNumber.length(); i++) {
 			if (!Character.isDigit(this.phoneNumber.charAt(i)) && this.phoneNumber.charAt(i) != '-')
 				return false;
@@ -120,10 +127,10 @@ public class UserRecord implements SQLRecord<String> {
 	/**
 	 * Generates a random string of characters to act as a unique identifier for 
 	 * this user
-	 * @return Random String of characters
+	 * @return Random String of 10 characters
 	 */
 	private String generateUniqueId() {
-		// Google justification for this
+
 		String randStr = new BigInteger(130, random).toString(32);
 
 		randStr = randStr.substring(0, Math.min(randStr.length(), 10));
@@ -145,11 +152,11 @@ public class UserRecord implements SQLRecord<String> {
 			throw new InvalidArgumentException("phoneNumber_null", "You must provide a phone number");
 
 		if (!validName())
-			throw new InvalidArgumentException("name_invalid", "Invalid name");
+			throw new InvalidArgumentException("name_invalid", "Invalid name. Name must be less than 20 characters and a valid phone number.");
 		if (!validEmail())
-			throw new InvalidArgumentException("email_invalid", "Invalid email");
+			throw new InvalidArgumentException("email_invalid", "Invalid email. Email must be less than 50 characters, and a valid email.");
 		if (!validPhoneNumber())
-			throw new InvalidArgumentException("phoneNumber_invalid", "Invalid phone number");
+			throw new InvalidArgumentException("phoneNumber_invalid", "Invalid phone number. Phone number must be less than 20 characters, and a valid phone number.");
 	}
 
 	/**
@@ -213,6 +220,7 @@ public class UserRecord implements SQLRecord<String> {
 			if (e.getMessage().contains("Duplicate entry") && e.getMessage().contains("email")) {
 				throw new InvalidArgumentException("email_taken", "That email address is taken");
 			}
+
 		}
 	}
 
