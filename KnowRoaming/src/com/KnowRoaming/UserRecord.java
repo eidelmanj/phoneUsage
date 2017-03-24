@@ -40,12 +40,14 @@ public class UserRecord implements SQLRecord<String> {
 	 *             If user tries to give a null SQLCommunicator object
 	 */
 	public UserRecord(String name, String email, String phoneNumber, SQLCommunicator sqlCom) throws Exception {
+		// Ensure that the SQL connection exists
 		if (sqlCom == null)
 			throw new Exception("You must pass a valid SQLCommunicator object");
+		
 		this.name = name;
 		this.email = email;
 		this.phoneNumber = phoneNumber;
-		this.uniqueId = generateUniqueId();
+		
 		this.sqlCom = sqlCom;
 
 	}
@@ -92,6 +94,7 @@ public class UserRecord implements SQLRecord<String> {
 	 * @return true if email is valid, false otherwise
 	 */
 	private boolean validEmail() {
+		
 		if (this.email == null)
 			return false;
 		
@@ -209,18 +212,38 @@ public class UserRecord implements SQLRecord<String> {
 	 * @throws Exception If there is already an entry in the DB for a user with the same email address
 	 */
 	public void commitNew() throws Exception {
-
-		this.validate();
-		String sqlCmd = "INSERT INTO user_records (unique_id, name, email, phone_number) VALUES (" + "\""
+		
+		/* Generating unique key: In theory it is possible to generate
+		 a string of characters that already exists in the DB
+		 Rather than doing an expensive check on whether the ID 
+		 exists, we are optimistic. We assume that no such ID 
+		 exists and retry if we fail. Since collisions are 
+		 extremely improbable, this is more efficient */
+		boolean commited = false; 
+		while (!commited) {
+			this.uniqueId = this.generateUniqueId();
+			this.validate();
+			String sqlCmd = "INSERT INTO user_records (unique_id, name, email, phone_number) VALUES (" + "\""
 				+ this.uniqueId + "\", \"" + this.name + "\", \"" + this.email + "\", \"" + this.phoneNumber + "\");";
 
-		try {
-			this.sqlCom.commitUpdate(sqlCmd);
-		} catch (SQLException e) {
-			if (e.getMessage().contains("Duplicate entry") && e.getMessage().contains("email")) {
-				throw new InvalidArgumentException("email_taken", "That email address is taken");
-			}
+			try {
+				this.sqlCom.commitUpdate(sqlCmd);
+				commited = true;
+			} catch (SQLException e) {
+				if (e.getMessage().contains("Duplicate entry") && e.getMessage().contains("email")) {
+					throw new InvalidArgumentException("email_taken", "That email address is taken");
+				}
+				else if (e.getMessage().contains("Duplicate entry") 
+						&& e.getMessage().contains("unique_id")) {
+					// We have generated a unique key that already exists in the DB. 
+					// we must go around again
+					commited = false;
+				}
+				else {
+					throw e;
+				}
 
+			}
 		}
 	}
 
