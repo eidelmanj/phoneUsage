@@ -27,6 +27,7 @@ Where "USERNAME" is your mysql username.
 Finally, update the settings.txt file to reflect your MySQL settings.  The first line should be your MySQL username. The second line should be your MySQL password. The third line should be the database name (knowroaming_eidelman by default).
 
 
+
 Running the Project
 ----------------------
 
@@ -37,11 +38,23 @@ file menu -> import -> Existing Projects into Workspace
 
 And select the root directory of this git repo as the root directory of the project. You may have to set the build path to include your own JRE (1.8 or higher). Project compliance should be 1.7 or higher. 
 
-I have also included a prebuilt runnable JAR file in the *jar/* directory. This can be run with the following command:
+I have also included a prebuilt runnable JAR file in the *jar/* directory. This can be run with the following command while in the root directory:
 ```
-cd jar
-java -jar KnowRoaming.jar
+java -jar jar/KnowRoaming.jar
 ```
+
+By default, KnowRoaming.jar looks for *settings.txt* in the current directory. However, it also takes an optional command line argument with the path to a settings file. For example the following would also work:
+
+```
+java -jar KnowRoaming.jar /PATH_TO/settings.txt
+```
+
+To rebuild the KnowRoaming.jar file, run the following command in the root directory:
+````
+ant jar
+````
+
+
 
 
 KnowRoaming App Commands
@@ -78,6 +91,12 @@ Design Decisions
 ------------------
 I have implemented a simple framework to encapsulate interaction with the MySQL database. Each type of record in the Database (user_record, usage_record) has a class associated with it that implements the SQLRecord class. These records are able to commit themselves to the database, update records in the DB as well as update themselves to match a corresponding record in the DB.
 
+I have also decided to encapsulate the communication between SQLRecord instances and the MySQL server into a new class called SQLCommunicator. This shields SQLRecords from having to deal with the complexities of SQL statements. SQLCommunicator initiates connection upon construction, and after that exposes methods for querying and updating the database. 
+
+
+In the instructions, we were asked to assign each user a unique ID that is ten characters long. I interpretted this to mean that these ID's should be a random set of characters (rather than simply having MySQL assign an integer ID and adding 0's to it to make it a unique ID). Although the likelihood of generating the same key twice is extremely low, there is the possibility we would do this. 
+ 
+I have made the assumption that the requirement that a User ID be unique is a hard requirement, and that we are not allowed to fail to commit a user just because we generated an ID that already exists (even though this situation is highly unlikely). Therefore, I have implemented a loop that repeatedly generates ID's and attempts to commit the UserRecord. If the DB raises an exception, we go back and generate a new ID. Since generating the same ID twice is extremely unlikely, this loop will only ever execute once in the overwhelming majority of cases.
 
 
 Testing
