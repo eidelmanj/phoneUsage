@@ -19,7 +19,7 @@ Before running the project, you must ensure that there is an appropriate databas
 
 To import the database, run the following command:
 ```
-mysql -u USERNAME -p knowroaming < generate_db.sql
+mysql -u USERNAME -p  < generate_db.sql
 ```
 
 Where "USERNAME" is your mysql username.
