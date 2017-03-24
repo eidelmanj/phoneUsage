@@ -132,6 +132,7 @@ public class Main {
 		if (findName.length > 2) {
 			nameStr = findName[1];
 			inStr = findName[0] +"name" + findName[2];
+
 		}
 		
 		String[] inputParts = inStr.split(" "); // Split string into command and arguments
