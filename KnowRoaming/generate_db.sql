@@ -8,9 +8,9 @@ DROP TABLE IF EXISTS user_records;
 
 CREATE TABLE user_records (
        unique_id VARCHAR(20) NOT NULL PRIMARY KEY,
-       name VARCHAR(20),
+       name VARCHAR(50),
        email VARCHAR(50) UNIQUE,
-       phone_number VARCHAR(20));
+       phone_number VARCHAR(50));
 
        
 CREATE TABLE data_types (

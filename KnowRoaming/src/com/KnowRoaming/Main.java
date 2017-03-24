@@ -121,21 +121,39 @@ public class Main {
 	 */
 	public static void parseAndExecute(String inStr, SQLCommunicator sqlCom) {
 		if (inStr.length() == 0) return; 
+		
+		// The user might want to give a name with a space in it, if so we must look
+		// for something in quotes
+		String nameStr = null;
+		
+		String[] findName = inStr.split("'");
+		// If there's a quote in the input string, then we can retrieve the name 
+		// that the user provided
+		if (findName.length > 2) {
+			nameStr = findName[1];
+			inStr = findName[0] +"name" + findName[2];
+		}
+		
 		String[] inputParts = inStr.split(" "); // Split string into command and arguments
 		
 		
 		if (inputParts.length == 0 ) return;
 
-				
+		
 		if (inputParts[0].equals("NEWUSER")) {
 
 			if (inputParts.length < 4)  {
-				System.out.println("Incorrect usage: NEWUSER name email phoneNumber\n");
+				System.out.println("Incorrect usage: NEWUSER 'name' email phoneNumber\n");
 				return;
 			}
-				
 			
-			runNewUser(inputParts[1], inputParts[2], inputParts[3], sqlCom);
+			if (nameStr == null) {
+				nameStr = inputParts[1];
+			}
+				
+		
+			
+			runNewUser(nameStr, inputParts[2], inputParts[3], sqlCom);
 		}
 		
 		else if (inputParts[0].equals("USAGE")) {

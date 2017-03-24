@@ -20,6 +20,9 @@ import java.math.BigInteger;
  */
 public class UserRecord implements SQLRecord<String> {
 
+	private final static int MAX_NAME_LENGTH = 50;
+	private final static int MAX_PHONE_LENGTH = 50;
+	private final static int MAX_EMAIL_LENGTH = 50;
 	private SQLCommunicator sqlCom;
 	private SecureRandom random = new SecureRandom();
 	private String name, email, phoneNumber, uniqueId;
@@ -78,10 +81,10 @@ public class UserRecord implements SQLRecord<String> {
 	private boolean validName() {
 		if (this.name == null)
 			return false;
-		if (this.name.length() >= 20)
+		if (this.name.length() >= MAX_NAME_LENGTH)
 			return false;
 		for (int i = 0; i < this.name.length(); i++) {
-			if (!Character.isLetter(this.name.charAt(i)))
+			if (this.name.charAt(i) != ' '  && !Character.isLetter(this.name.charAt(i)))
 				return false;
 		}
 		return true;
@@ -97,8 +100,8 @@ public class UserRecord implements SQLRecord<String> {
 		
 		if (this.email == null)
 			return false;
-		
-		if (this.email.length() >= 50)
+	
+		if (this.email.length() >= MAX_EMAIL_LENGTH)
 			return false;
 		int atCharIdx = this.email.indexOf('@');
 		int periodCharIdx = this.email.lastIndexOf('.');
@@ -118,7 +121,7 @@ public class UserRecord implements SQLRecord<String> {
 	 */
 	private boolean validPhoneNumber() {
 		if (this.phoneNumber == null) return false;
-		if (this.phoneNumber.length() >= 20) return false;
+		if (this.phoneNumber.length() >=  MAX_PHONE_LENGTH) return false;
 		for (int i = 0; i < this.phoneNumber.length(); i++) {
 			if (!Character.isDigit(this.phoneNumber.charAt(i)) && this.phoneNumber.charAt(i) != '-')
 				return false;
@@ -155,11 +158,11 @@ public class UserRecord implements SQLRecord<String> {
 			throw new InvalidArgumentException("phoneNumber_null", "You must provide a phone number");
 
 		if (!validName())
-			throw new InvalidArgumentException("name_invalid", "Invalid name. Name must be less than 20 characters and a valid phone number.");
+			throw new InvalidArgumentException("name_invalid", "Invalid name. Name must be less than " + MAX_NAME_LENGTH + " characters and a valid phone number.");
 		if (!validEmail())
-			throw new InvalidArgumentException("email_invalid", "Invalid email. Email must be less than 50 characters, and a valid email.");
+			throw new InvalidArgumentException("email_invalid", "Invalid email. Email must be less than "+MAX_EMAIL_LENGTH+" characters, and a valid email.");
 		if (!validPhoneNumber())
-			throw new InvalidArgumentException("phoneNumber_invalid", "Invalid phone number. Phone number must be less than 20 characters, and a valid phone number.");
+			throw new InvalidArgumentException("phoneNumber_invalid", "Invalid phone number. Phone number must be less than "+MAX_PHONE_LENGTH+" characters, and a valid phone number.");
 	}
 
 	/**

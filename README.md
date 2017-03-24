@@ -63,8 +63,12 @@ There are three commands in the KnowRoaming APP
 ```
 NEWUSER name email phoneNumber
 ```
-This command creates a new user with the given name, email and phone number in the database. If successful, this command will spit out the unique 10 character ID of the user. Otherwise it will give an error message
+This command creates a new user with the given name, email and phone number in the database. If successful, this command will spit out the unique 10 character ID of the user. Otherwise it will give an error message. The "name" category is allowed to have single quotes around it, in which case we can give names that have spaces in them. 
 
+Example:
+
+```
+NEWUSER 'Jonathan Eidelman' jonathan.eidelman@email.com 123-4567
 
 ```
 USAGE userId dd-MM-yyyy dataType
@@ -97,6 +101,8 @@ I have also decided to encapsulate the communication between SQLRecord instances
 In the instructions, we were asked to assign each user a unique ID that is ten characters long. I interpretted this to mean that these ID's should be a random set of characters (rather than simply having MySQL assign an integer ID and adding 0's to it to make it a unique ID). Although the likelihood of generating the same key twice is extremely low, there is the possibility we would do this. 
  
 I have made the assumption that the requirement that a User ID be unique is a hard requirement, and that we are not allowed to fail to commit a user just because we generated an ID that already exists (even though this situation is highly unlikely). Therefore, I have implemented a loop that repeatedly generates ID's and attempts to commit the UserRecord. If the DB raises an exception, we go back and generate a new ID. Since generating the same ID twice is extremely unlikely, this loop will only ever execute once in the overwhelming majority of cases.
+
+Due to the simplicity of the assignment, I have designed a very rudimentary parser for command line inputs. In a more realistic version of this tool, we could use one of the many available parser generators for Java to create something more robust.
 
 
 Testing

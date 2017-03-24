@@ -132,7 +132,7 @@ public class Tests {
 		UserRecord  uRecord = null;
 
 		try {
-			uRecord = new UserRecord("aa", "check@test.com", "11111111111111111111", sqlCom);
+			uRecord = new UserRecord("aa", "check@test.com", "111111111111111111111111111111111111111111111111111111111111", sqlCom);
 		} catch (Exception e) {
 			e.printStackTrace();
 			assert(false);
@@ -147,7 +147,7 @@ public class Tests {
 		UserRecord  uRecord = null;
 
 		try {
-			uRecord = new UserRecord("aaaaaaaaaaaaaaaaaaaa", "check@test.com", "123-456", sqlCom);
+			uRecord = new UserRecord("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "check@test.com", "123-456", sqlCom);
 		} catch (Exception e) {
 			e.printStackTrace();
 			assert(false);
