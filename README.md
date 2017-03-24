@@ -60,6 +60,10 @@ ant jar
 KnowRoaming App Commands
 -------------------------
 There are three commands in the KnowRoaming APP
+
+NEWUSER Command
+---------------
+
 ```
 NEWUSER name email phoneNumber
 ```
@@ -69,6 +73,10 @@ Example:
 
 ```
 NEWUSER 'Jonathan Eidelman' jonathan.eidelman@email.com 123-4567
+```
+
+USAGE Command
+--------------
 
 ```
 USAGE userId dd-MM-yyyy dataType
@@ -80,7 +88,8 @@ This command enters a new usage record into the database. The new usage record i
 - DATA
 - VOICE
 
-
+SHOW Command
+-------------
 ```
 SHOW userId FROM dd-MM-yyyy TO dd-MM-yyyy
 ```
