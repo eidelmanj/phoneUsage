@@ -158,11 +158,11 @@ public class UserRecord implements SQLRecord<String> {
 			throw new InvalidArgumentException("phoneNumber_null", "You must provide a phone number");
 
 		if (!validName())
-			throw new InvalidArgumentException("name_invalid", "Invalid name. Name must be less than " + MAX_NAME_LENGTH + " characters and a valid phone number.");
+			throw new InvalidArgumentException("name_invalid", "Invalid name " + this.name + ". Name must be less than " + MAX_NAME_LENGTH + " characters and a valid name.");
 		if (!validEmail())
-			throw new InvalidArgumentException("email_invalid", "Invalid email. Email must be less than "+MAX_EMAIL_LENGTH+" characters, and a valid email.");
+			throw new InvalidArgumentException("email_invalid", "Invalid email " + this.email +". Email must be less than "+MAX_EMAIL_LENGTH+" characters, and a valid email.");
 		if (!validPhoneNumber())
-			throw new InvalidArgumentException("phoneNumber_invalid", "Invalid phone number. Phone number must be less than "+MAX_PHONE_LENGTH+" characters, and a valid phone number.");
+			throw new InvalidArgumentException("phoneNumber_invalid", "Invalid phone number " + this.phoneNumber + ". Phone number must be less than "+MAX_PHONE_LENGTH+" characters, and a valid phone number.");
 	}
 
 	/**
