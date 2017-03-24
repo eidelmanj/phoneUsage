@@ -108,7 +108,10 @@ public class Main {
 			
 		} catch (DateTimeParseException e) {
 			System.out.println("Incorrect date format! Please use 'dd-MM-yyyy'");
+		} catch (InvalidArgumentException e) {
+			System.out.println(e.getMessage());
 		} catch (Exception e) {
+			// This should not happen unless something is really wrong
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
